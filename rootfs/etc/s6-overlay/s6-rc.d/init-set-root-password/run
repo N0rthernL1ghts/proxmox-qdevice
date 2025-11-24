@@ -1,0 +1,35 @@
+#!/command/with-contenv bash
+# shellcheck shell=bash
+
+change_password() {
+    printf "${1:?}:${2:?}\n" | chpasswd
+}
+
+# init-set-root-password main
+main() {
+    # This will prepend service name to all output from here
+    exec > >(while read -r line; do echo "[init-set-root-password] ${line}"; done) 2>&1
+
+    local new_root_password=${ROOT_PASSWORD:-}
+    local root_password="${new_root_password%$'\n'}"
+
+    if [[ -z ${root_password} ]]; then
+        printf "Error: ROOT_PASSWORD is empty or not set\n"
+        return 1
+    fi
+
+    if [[ -f "/root/.init_complete" ]]; then
+        printf "Init already complete\n"
+        return
+    fi
+
+
+    printf "Initializing root password\n"
+
+    change_password root "${root_password}"
+
+
+    # Prevent running on every container startup
+    touch /root/.init_complete
+}
+main
