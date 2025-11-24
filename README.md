@@ -22,7 +22,7 @@ This repo is designed to run from either docker compose or a container manager, 
 
 ## Configuration:
 
-Modify the docker-compose.yml file.   Make sure to change:
+Modify the compose.yaml file.   Make sure to change:
 
 * Environment Variable NEW_ROOT_PASSWORD
 * location of your corosync-data (so you can keep your configuration between restarts, etc.)
@@ -40,7 +40,7 @@ You can either run the command:
 
 `docker compose up -d`
 
-or cut and past the docker-compose.yml into portainer.io as a stack and then deploy.
+or cut and past the compose.yaml into portainer.io as a stack and then deploy.
 
 ## Tested as working on:
 
@@ -58,7 +58,7 @@ or cut and past the docker-compose.yml into portainer.io as a stack and then dep
 This container installs and configures a sshd server that permits root logins.  Proxmox runs in the same configuration.  Upon startup, if the environment variable **NEW_ROOT_PASSWORD** exists the root password will be set to the value of that variable upon boot.   You can specify what the root password should be setting the value of **NEW_ROOT_PASSWORD** to a password in one of the following ways:
 
 1) If you are using a container manager, such as portainer, set the environment variable **NEW_ROOT_PASSWORD** to your specified root password.  This variable should get passed to the container.
-2) Follow one of the Docker provided ways documented in how to ["Set environment variables within your container's environment"](https://docs.docker.com/compose/how-tos/environment-variables/set-environment-variables/).  Please note that one of the ways described is setting the password in the docker-compose.yml (or the stack) in the environment section (i.e. hardcoding it).   If you hardcode the password like this, you can expose the password.  You have been warned.
+2) Follow one of the Docker provided ways documented in how to ["Set environment variables within your container's environment"](https://docs.docker.com/compose/how-tos/environment-variables/set-environment-variables/).  Please note that one of the ways described is setting the password in the compose.yaml (or the stack) in the environment section (i.e. hardcoding it).   If you hardcode the password like this, you can expose the password.  You have been warned.
 
 Please note that all of the ways listed above to set the environment above should survive the recreation of the container.
 
