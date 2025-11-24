@@ -1,32 +1,24 @@
+FROM scratch AS rootfs
+
+COPY --chmod=0755 ["./set_root_password.sh", "/usr/local/bin/set_root_password.sh"]
+COPY ["./supervisord.conf", "/etc/supervisord.conf"]
+
+
+
 FROM debian:bookworm-slim
 
-RUN apt update \
-    && apt -y upgrade \
-    && apt install --no-install-recommends -y supervisor \
-    && apt -y autoremove \
-    && apt clean all
+RUN export DEBIAN_FRONTEND=noninteractive \
+    && apt-get update \
+    && apt-get -y upgrade \
+    && apt-get install --no-install-recommends -y supervisor openssh-server corosync-qnetd \
+    && apt-get -y autoremove \
+    && apt-get clean all \
+    && sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config \
+    && mkdir -p /run/sshd
 
-RUN apt update \
-    && apt install --no-install-recommends -y openssh-server \
-    && apt -y autoremove \
-    && apt clean all
-
-RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
-COPY set_root_password.sh /usr/local/bin/set_root_password.sh
-RUN chown root.root /usr/local/bin/set_root_password.sh \
-    && chmod 755 /usr/local/bin/set_root_password.sh
-
-RUN apt update \
-    && apt install --no-install-recommends -y corosync-qnetd \
-    && apt -y autoremove \
-    && apt clean all
-
-RUN mkdir -p /run/sshd
-
-COPY supervisord.conf /etc/supervisord.conf
+COPY --from=rootfs ["/", "/"]
 
 EXPOSE 22
 EXPOSE 5403
 
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
-
