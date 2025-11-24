@@ -1,0 +1,13 @@
+.git/
+.github/
+
+# Idea
+.idea/
+
+# Data secrets and override files
+data/
+secrets/
+compose.override.yaml
+docker-compose.override.yml
+
+
