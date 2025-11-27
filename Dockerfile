@@ -16,13 +16,13 @@ ARG DEBIAN_DISTRO
 FROM debian:${DEBIAN_DISTRO}-slim
 
 ARG COROSYNC_QNETD_VERSION
-RUN export DEBIAN_FRONTEND=noninteractive \
+RUN --mount=type=cache,target=/var/lib/apt/lists,sharing=locked \
+    --mount=type=cache,target=/var/cache/apt/archives,sharing=locked \
+    export DEBIAN_FRONTEND=noninteractive \
     && apt-get update \
     && apt-get -y upgrade \
     && COROSYNC_QNETD_DEB_VERSION=$(apt-cache madison corosync-qnetd | awk '{print $3}' | grep "^${COROSYNC_QNETD_VERSION}" | head -n 1) \
     && apt-get install --no-install-recommends -y openssh-server "corosync-qnetd=${COROSYNC_QNETD_DEB_VERSION}" \
-    && apt-get -y autoremove \
-    && apt-get clean all \
     && sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config \
     && mkdir -p /run/sshd
 
