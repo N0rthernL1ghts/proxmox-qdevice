@@ -1,4 +1,4 @@
-ARG COROSYNC_QNETD_VERSION=3.0.3-2
+ARG COROSYNC_QNETD_VERSION=3.0.3
 ARG DEBIAN_DISTRO=trixie
 
 FROM scratch AS rootfs
@@ -19,7 +19,8 @@ ARG COROSYNC_QNETD_VERSION
 RUN export DEBIAN_FRONTEND=noninteractive \
     && apt-get update \
     && apt-get -y upgrade \
-    && apt-get install --no-install-recommends -y openssh-server "corosync-qnetd=${COROSYNC_QNETD_VERSION}" \
+    && COROSYNC_QNETD_DEB_VERSION=$(apt-cache madison corosync-qnetd | awk '{print $3}' | grep "^${COROSYNC_QNETD_VERSION}" | head -n 1) \
+    && apt-get install --no-install-recommends -y openssh-server "corosync-qnetd=${COROSYNC_QNETD_DEB_VERSION}" \
     && apt-get -y autoremove \
     && apt-get clean all \
     && sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config \
